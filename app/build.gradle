@@ -33,13 +33,19 @@ dependencies {
     implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.0.0'
 
 
+    // https://mvnrepository.com/artifact/info.picocli/picocli
+    implementation group: 'info.picocli', name: 'picocli', version: '4.6.2'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+
+    implementation 'com.google.code.gson:gson:2.8.9'
+
+
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'io.confluent.ps.tools.App'
+    mainClass = 'io.confluent.ps.tools.GetKafkaClusterData'
 }
 
-jar {
-    baseName = 'kafka-data-collector'
-}
