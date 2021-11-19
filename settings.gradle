@@ -8,6 +8,6 @@
  */
 
 rootProject.name = 'kafka-data-collector'
-include('app')
+include('kafka-config-collector')
 
 

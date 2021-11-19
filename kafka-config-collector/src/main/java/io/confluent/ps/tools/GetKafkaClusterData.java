@@ -3,6 +3,10 @@ package io.confluent.ps.tools;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartitionReplica;
+import org.apache.kafka.common.config.ConfigResource;
+import org.apache.kafka.common.internals.Topic;
 import picocli.CommandLine;
 
 import java.io.*;
@@ -94,16 +98,26 @@ public class GetKafkaClusterData implements Callable<Integer> {
             //Cluster Description
             DescribeClusterResult clusterDescription = client.describeCluster();
 
-            KafkaClusterConfiguration config = new KafkaClusterConfiguration(clusterDescription.clusterId().get());
+            KafkaClusterConfiguration kafkaClusterConfig = new KafkaClusterConfiguration(clusterDescription.clusterId().get());
 
 //            String clusterID = clusterDescription.clusterId().get();
 //            Collection<Node> clusterNodes = clusterDescription.nodes().get();
 //            Node clusterController = clusterDescription.controller().get();
 //            Set<AclOperation> clusterAclOperations = clusterDescription.authorizedOperations().get();
 
-            config.setNodes(clusterDescription.nodes().get());
-            config.setController(clusterDescription.controller().get());
-            config.setAclOperations(clusterDescription.authorizedOperations().get());
+            kafkaClusterConfig.setNodes(clusterDescription.nodes().get());
+            kafkaClusterConfig.setController(clusterDescription.controller().get());
+            kafkaClusterConfig.setAclOperations(clusterDescription.authorizedOperations().get());
+
+            //Build a list of Broker IDs as a convenience
+            List<String> brokerIdStrings = new LinkedList<String>();
+            List<Integer> brokerIds = new LinkedList<Integer>();
+            for ( Node node : kafkaClusterConfig.getNodes()) {
+                brokerIdStrings.add(node.idString());
+                brokerIds.add(node.id());
+            }
+
+
 
             //Topics
             // TODO -      - describeTopics
@@ -112,27 +126,54 @@ public class GetKafkaClusterData implements Callable<Integer> {
             ListTopicsResult clusterTopicList = client.listTopics(listTopicsOptions);
             DescribeTopicsOptions describeTopicsOptions = new DescribeTopicsOptions();
             describeTopicsOptions.includeAuthorizedOperations(true);
-            DescribeTopicsResult clusterTopics = client.describeTopics(clusterTopicList.names().get(), describeTopicsOptions);
+            Collection<String> topicNamesList = new LinkedList<String>();
+            topicNamesList.addAll(clusterTopicList.names().get());
 
-            config.setTopicDescriptions(clusterTopics.all().get());
+            DescribeTopicsResult clusterTopics = client.describeTopics(topicNamesList, describeTopicsOptions);
 
+            kafkaClusterConfig.setTopicDescriptions(clusterTopics.all().get());
 
+            // TODO       - describeConfigs
+            Collection<ConfigResource> resources = new LinkedList<ConfigResource>();
+            for (String brokerId : brokerIdStrings ) {
+                resources.add(new ConfigResource(ConfigResource.Type.BROKER, brokerId));
+            }
+            for (String topicName : topicNamesList) {
+                resources.add(new ConfigResource(ConfigResource.Type.TOPIC, topicName));
+            }
+
+            DescribeTopicsOptions describeConfigOptions = new DescribeTopicsOptions();
+            describeConfigOptions.includeAuthorizedOperations(true);
+            DescribeConfigsResult describeConfigsResult = client.describeConfigs(resources); //, describeConfigOptions);
+            Map<ConfigResource, Config> configResourceConfigMap = describeConfigsResult.all().get();
+            kafkaClusterConfig.setResourceConfigMap(configResourceConfigMap);
+
+            // TODO        - describeLogDirs
+
+            DescribeLogDirsResult describeLogDirsResult = client.describeLogDirs(brokerIds);
+            kafkaClusterConfig.setBrokerLogDirsInfoMap(describeLogDirsResult.all().get());
+
+            // TODO:       - describeReplicaLogDirs
+
+            Collection<TopicPartitionReplica> replicas = new LinkedList<TopicPartitionReplica>();
+            TopicPartitionReplica topicPartitionReplica = new TopicPartitionReplica("WIKIPEDIABOT", 0, 1);
+            replicas.add(topicPartitionReplica);
+            DescribeReplicaLogDirsResult describeReplicaLogDirsResult = client.describeReplicaLogDirs(replicas);
+            Map<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo> topicPartitionReplicaReplicaLogDirInfoMap = describeReplicaLogDirsResult.all().get();
+            kafkaClusterConfig.setReplicaLogDirs(topicPartitionReplicaReplicaLogDirInfoMap);
 
             // TODO - describeACLs
-// TODO - describeClientQuotas
-// TODO       - describeConfigs
-// TODO        - describeConsumerGroups
-// TODO        - describeDelegationToken
-// TODO        - describeFeatures
-// TODO        - describeLogDirs
-// TODO        - describeProducers
-// TODO:       - describeReplicaLogDirs
-// TODO -      - describeTransactions
-// TODO -      - describeUserScramCredentials
-// TODO -      - listConsumerGroupOffsets
-// TODO -      - listOffsets
-// TODO -      - listPartitionReassignments
-// TODO -      - metrics
+            // TODO - describeClientQuotas
+            // TODO        - describeConsumerGroups
+            // TODO        - describeDelegationToken
+            // TODO        - describeFeatures
+            // TODO        - describeProducers
+            // TODO -      - describeTransactions
+            // TODO -      - describeUserScramCredentials
+            // TODO -      - listConsumerGroupOffsets
+            // TODO -      - listOffsets
+            // TODO -      - listPartitionReassignments
+            // TODO -      - metrics
 
 
 
@@ -140,7 +181,7 @@ public class GetKafkaClusterData implements Callable<Integer> {
             builder.setPrettyPrinting().serializeNulls();
             Gson gson = builder.create();
 
-            System.out.println(gson.toJson(config));
+            System.out.println(gson.toJson(kafkaClusterConfig));
 
 
 
