@@ -3,6 +3,8 @@ package io.confluent.ps.tools;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.common.Metric;
+import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionReplica;
 import org.apache.kafka.common.config.ConfigResource;
@@ -153,27 +155,34 @@ public class GetKafkaClusterData implements Callable<Integer> {
             DescribeLogDirsResult describeLogDirsResult = client.describeLogDirs(brokerIds);
             kafkaClusterConfig.setBrokerLogDirsInfoMap(describeLogDirsResult.all().get());
 
-            // TODO:       - describeReplicaLogDirs
+            /* describeReplicaLogDirs
+            Not sure it offers us anything over the LogDirs
+//
+//            Collection<TopicPartitionReplica> replicas = new LinkedList<TopicPartitionReplica>();
+//            TopicPartitionReplica topicPartitionReplica = new TopicPartitionReplica("WIKIPEDIABOT", 0, 1);
+//            replicas.add(topicPartitionReplica);
+//            DescribeReplicaLogDirsResult describeReplicaLogDirsResult = client.describeReplicaLogDirs(replicas);
+//            Map<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo> topicPartitionReplicaReplicaLogDirInfoMap = describeReplicaLogDirsResult.all().get();
+//            kafkaClusterConfig.setReplicaLogDirs(topicPartitionReplicaReplicaLogDirInfoMap);
+//
+*/
+            // TODO -      - metrics
 
-            Collection<TopicPartitionReplica> replicas = new LinkedList<TopicPartitionReplica>();
-            TopicPartitionReplica topicPartitionReplica = new TopicPartitionReplica("WIKIPEDIABOT", 0, 1);
-            replicas.add(topicPartitionReplica);
-            DescribeReplicaLogDirsResult describeReplicaLogDirsResult = client.describeReplicaLogDirs(replicas);
-            Map<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo> topicPartitionReplicaReplicaLogDirInfoMap = describeReplicaLogDirsResult.all().get();
-            kafkaClusterConfig.setReplicaLogDirs(topicPartitionReplicaReplicaLogDirInfoMap);
+            Map<MetricName, ? extends Metric> metrics = client.metrics();
+            kafkaClusterConfig.addMetrics(metrics);
+            // TODO        - describeFeatures
+
 
             // TODO - describeACLs
             // TODO - describeClientQuotas
             // TODO        - describeConsumerGroups
             // TODO        - describeDelegationToken
-            // TODO        - describeFeatures
             // TODO        - describeProducers
             // TODO -      - describeTransactions
             // TODO -      - describeUserScramCredentials
             // TODO -      - listConsumerGroupOffsets
             // TODO -      - listOffsets
             // TODO -      - listPartitionReassignments
-            // TODO -      - metrics
 
 
 

@@ -3,6 +3,8 @@ package io.confluent.ps.tools;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.DescribeReplicaLogDirsResult;
 import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.common.Metric;
+import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionReplica;
 import org.apache.kafka.common.acl.AclOperation;
@@ -22,6 +24,7 @@ public class KafkaClusterConfiguration {
     private Map<ConfigResource, Config> resourceConfigMap = new HashMap<>();
     private Map<Integer, Map<String,DescribeLogDirsResponse.LogDirInfo>> brokerLogDirsInfoMap = new HashMap<Integer, Map<String,DescribeLogDirsResponse.LogDirInfo>>();
     private Map<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo> replicaLogDirs = new HashMap<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo>();
+    private HashMap<MetricName, ? extends Metric> metrics = new HashMap<MetricName, Metric>();
 
     public Map<String, TopicDescription> getTopicDescriptionMap() {
         return topicDescriptionMap;
@@ -87,5 +90,9 @@ public class KafkaClusterConfiguration {
 
     public Map<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo> getReplicaLogDirs() {
         return replicaLogDirs;
+    }
+
+    public void addMetrics(Map<MetricName, ? extends Metric> metrics) {
+        this.metrics.putAll(metrics);
     }
 }
