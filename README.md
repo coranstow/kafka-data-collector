@@ -34,6 +34,15 @@ See `example/scan.sh`.
 You might have to specify the collected datafile as a JSON input.
 
 ### Configuration of your scanner
+*For All the numbered items, the item number does not need to be continous. The numbered item should not be more than 3000*
+
+It is absolutely fine with:
+```
+set1.topics.whitelist.regex.0=.*
+set1.topics.whitelist.regex.13=.*
+```
+As you can see, `.1` to `.12` are missing is fine.
+
 See `example/scan-config.properties`
 
 You can define multiple scan sets by `scan.list` and a bunch of parameters under `setx.xxx` settings.
