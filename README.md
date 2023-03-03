@@ -100,3 +100,75 @@ The config above sends an email for all offending scan results.
 You may also write another notifier to integrate with other systems.
 You just need to implment a `io.confluent.ps.tools.notifications.Notifier`.
 
+Note that you may have different profiles for different topics, in such cases, you just need
+to implement different scan sets. `set1` may include a set of topics and expected configs, `set2` on the other hand, can be differently configured.
+
+*Note: The set names can be anything simple. e.g. goldset, silverset are fine too!* 
+
+### Out-of-the-box scanner tasks
+#### `io.confluent.ps.tools.checks.OfflinePartitionCheck`
+This task checks if any partition has `ISR` less than topic configured `min.insync.replicas`.
+This task require no parameters.
+
+#### `io.confluent.ps.tools.checks.TopicConfigChecks`
+This task checks if topic configs is what you want it to be.
+Example
+```
+set1.task.1=io.confluent.ps.tools.checks.TopicConfigChecks
+set1.task.1.keys-to-check.0.name=confluent.placement.constraints
+set1.task.1.keys-to-check.0.value={"version":2,"replicas":[{"count":1,"constraints":{"rack":"DC1"}},{"count":1,"constraints":{"rack":"DC2"}}],"observers":[{"count":1,"constraints":{"rack":"DC1"}},{"count":1,"constraints":{"rack":"DC2"}}],"observerPromotionPolicy":"under-min-isr"}
+set1.task.1.keys-to-check.0.isJson=true
+set1.task.1.keys-to-check.1.name=retention.ms
+set1.task.1.keys-to-check.1.value=604800000
+set1.task.1.keys-to-check.2.name=compression.type
+set1.task.1.keys-to-check.2.value=producer
+set1.task.1.keys-to-check.3.name=retention.bytes
+set1.task.1.keys-to-check.3.value=-1
+set1.task.1.keys-to-check.4.name=compression.type
+set1.task.1.keys-to-check.4.value=producer
+set1.task.1.keys-to-check.5.name=something-should-be-null
+set1.task.1.keys-to-check.6.value=@@NULL
+set1.task.1.keys-to-check.6.name=something-should-be-empty-string
+set1.task.1.keys-to-check.6.value=@@EMPTY
+```
+
+As you can see above, empty strings can be represented using `@@EMPTY` macro and NULLs can be represented by `@@NULL` macro.
+
+#### `io.confluent.ps.tools.checks.ISRSizeCheck`
+This task check if ISR size match expectation.
+Example
+```
+set1.task.2=io.confluent.ps.tools.checks.ISRSizeCheck
+set1.task.2.isr.size.should.be=2
+```
+
+#### `io.confluent.ps.tools.checks.ReplicaSizeCheck`
+This task check if number of replicas matches expectation.
+Example
+```
+set1.task.3=io.confluent.ps.tools.checks.ReplicaSizeCheck
+set1.task.3.replica.size.should.be=4
+```
+
+#### `io.confluent.ps.tools.checks.LeaderImbalanceCheck`
+This task check if leader ship if imbalanced. It also checks for brokers has no leadership as well.
+Example:
+```
+set1.task.4.min.total.partitions.for.alarm=100
+set1.task.4.maximum.max-leader-count.to.smallest-leader-count.ratio=1.3
+```
+
+In the above example, this check will not complain if the total partition in the cluster is less than 100.
+The task will complain if the broker with most leadership of partitions vs broker with least leadership of partitions
+ratio is larger or equal to 1.3. (e.g. 30% more)
+
+#### `io.confluent.ps.tools.checks.OnlineBrokerCheck`
+This task check if all expected brokers are online. And no other unknown brokers are online.
+```
+set1.task.5=io.confluent.ps.tools.checks.OnlineBrokerCheck
+set1.task.5.online.broker.list.should.be=101,102,201,202
+```
+This task also by default check if the cluster has an active controller. It will report error if no controller found.
+
+
+
