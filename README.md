@@ -134,7 +134,10 @@ set1.task.1.keys-to-check.6.value=@@EMPTY
 
 As you can see above, empty strings can be represented using `@@EMPTY` macro and NULLs can be represented by `@@NULL` macro.
 
-NOTE: JSON fields are checked for TRUE equals, not string equality. The space and field orders does not matttttter.
+By default, the configs are checked for String equality. Unless you set `isJson = true` for that field.
+JSON fields are checked for logical equality, not string equality. The space and field orders in the JSON does not matttttter.
+
+Therefore, you have to set `isJson=true` for JSON fields. See the `confluent.placement.constraints` for example.
 
 #### `io.confluent.ps.tools.checks.ISRSizeCheck`
 This task check if ISR size match expectation.
