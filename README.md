@@ -90,15 +90,18 @@ The default config (above) writes the summary to a file.
 
 ```
 notification.class=io.confluent.ps.tools.notifications.SMTPNotifier
-notification.smtp.server=host-of-smtp
-notification.smtp.port=25
-notification.smtp.tls=true
-notification.smtp.username=some-user
-notification.smtp.password=some-password
-notification.smtp.truststore.pkcs12.file=truststore.jks
-notification.smtp.truststore.pkcs12.password=changeit
-notification.recipient=some-user@some-company.com
-notification.subject=Kafka Cluster Config Scan result for %TS%
+notification.mail.smtp.auth=false
+notification.mail.smtp.ssl.enable=true
+notification.mail.smtp.starttls.enable=false
+notification.mail.smtp.host=192.168.44.100
+notification.mail.smtp.port=465
+notification.mail.smtp.ssl.checkserveridentity=false
+notification.mail.smtp.ssl.trust=*
+#notification.mail.smtp.username=dummy-user
+#notification.mail.smtp.password=dummy-password
+notification.mail.from=wushilin.sg@gmail.com
+notification.mail.to=wushilin.sg@gmail.com
+notification.mail.subject=Kafka Config Alert @ %TS%
 ```
 The config above sends an email for all offending scan results.
 
