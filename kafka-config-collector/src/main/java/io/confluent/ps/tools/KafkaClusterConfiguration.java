@@ -24,7 +24,7 @@ public class KafkaClusterConfiguration {
     private Map<ConfigResource, Config> resourceConfigMap = new HashMap<>();
     private Map<Integer, Map<String,DescribeLogDirsResponse.LogDirInfo>> brokerLogDirsInfoMap = new HashMap<Integer, Map<String,DescribeLogDirsResponse.LogDirInfo>>();
     private Map<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo> replicaLogDirs = new HashMap<TopicPartitionReplica, DescribeReplicaLogDirsResult.ReplicaLogDirInfo>();
-    private HashMap<MetricName, ? extends Metric> metrics = new HashMap<MetricName, Metric>();
+    private HashMap<MetricName, Metric> metrics = new HashMap<MetricName, Metric>();
 
     public Map<String, TopicDescription> getTopicDescriptionMap() {
         return topicDescriptionMap;

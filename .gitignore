@@ -16,3 +16,7 @@ gradle-app.setting
 # Ignore Gradle build output directory
 build
 /.idea/
+tmp/
+kafka-data-collector/build/
+example/output1.json
+example/scan-result-*.txt

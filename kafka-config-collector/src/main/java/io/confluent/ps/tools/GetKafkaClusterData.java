@@ -32,6 +32,9 @@ public class GetKafkaClusterData implements Callable<Integer> {
     @CommandLine.Option(names = { "-b", "--bootstrap-servers" }, description = "The Bootstrap Server(s) string") 
     String bootstrapServers = null;
 
+    @CommandLine.Option(names = {"-o", "--output"}, description = "The output JSON file")
+    String outputFile = "get-kafka-cluster-data-output.json";
+
     @CommandLine.Option(names = {"--schema-registry"})
     protected String schemaRegistryURL;
     
@@ -190,7 +193,9 @@ public class GetKafkaClusterData implements Callable<Integer> {
             builder.setPrettyPrinting().serializeNulls();
             Gson gson = builder.create();
 
-            System.out.println(gson.toJson(kafkaClusterConfig));
+            try(FileWriter fw = new FileWriter(outputFile)) {
+                fw.write(gson.toJson(kafkaClusterConfig));
+            }
 
 
 
