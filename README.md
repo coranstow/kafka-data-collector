@@ -81,10 +81,6 @@ All these configs will be passed to the task as a properties as:
 }
 ```
 
-You may implement additional checks by implementing `io.confluent.ps.tools.checks.ConfigCheckTask`.
-
-For example or reference, please refer to `kafka-data-collector/src/main/java/io/confluent/ps/tools/checks` package.
-
 The scan result will report the offended rules using the notifier specified by
 ```
 notification.class=io.confluent.ps.tools.notifications.DefaultNotifier
@@ -184,3 +180,9 @@ set1.task.5=io.confluent.ps.tools.checks.OnlineBrokerCheck
 set1.task.5.online.broker.list.should.be=101,102,201,202
 ```
 This task also by default check if the cluster has an active controller. It will report error if no controller found.
+
+### Extending the tool with more tasks
+
+You may implement additional checks by implementing `io.confluent.ps.tools.checks.ConfigCheckTask`.
+
+For example or reference, please refer to `kafka-data-collector/src/main/java/io/confluent/ps/tools/checks` package.
