@@ -127,7 +127,7 @@ set1.task.1.keys-to-check.3.value=-1
 set1.task.1.keys-to-check.4.name=compression.type
 set1.task.1.keys-to-check.4.value=producer
 set1.task.1.keys-to-check.5.name=something-should-be-null
-set1.task.1.keys-to-check.6.value=@@NULL
+set1.task.1.keys-to-check.5.value=@@NULL
 set1.task.1.keys-to-check.6.name=something-should-be-empty-string
 set1.task.1.keys-to-check.6.value=@@EMPTY
 ```
@@ -138,6 +138,7 @@ By default, the configs are checked for String equality. Unless you set `isJson 
 JSON fields are checked for logical equality, not string equality. The space and field orders in the JSON does not matttttter.
 
 Therefore, you have to set `isJson=true` for JSON fields. See the `confluent.placement.constraints` for example.
+`isJson = false` by default.
 
 #### `io.confluent.ps.tools.checks.ISRSizeCheck`
 This task check if ISR size match expectation.
@@ -174,6 +175,3 @@ set1.task.5=io.confluent.ps.tools.checks.OnlineBrokerCheck
 set1.task.5.online.broker.list.should.be=101,102,201,202
 ```
 This task also by default check if the cluster has an active controller. It will report error if no controller found.
-
-
-
