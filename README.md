@@ -134,6 +134,8 @@ set1.task.1.keys-to-check.6.value=@@EMPTY
 
 As you can see above, empty strings can be represented using `@@EMPTY` macro and NULLs can be represented by `@@NULL` macro.
 
+NOTE: JSON fields are checked for TRUE equals, not string equality. The space and field orders does not matttttter.
+
 #### `io.confluent.ps.tools.checks.ISRSizeCheck`
 This task check if ISR size match expectation.
 Example
